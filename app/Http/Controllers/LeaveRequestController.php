@@ -42,7 +42,8 @@ class LeaveRequestController extends Controller
 
         $filePath = null;
         if ($request->hasFile('attachment')) {
-$filePath = $request->file('attachment')->store('attachments', 'public');        }
+            $filePath = $request->file('attachment')->store('attachments', 'public');
+        }
 
         $leave = LeaveRequest::create([
             'user_id' => $user->id,
@@ -99,6 +100,25 @@ $filePath = $request->file('attachment')->store('attachments', 'public');       
 
         $leave = LeaveRequest::findOrFail($id);
 
+        if ($leave->status !== 'pending') {
+            return response()->json([
+                'message' => 'Request sudah diproses'
+            ], 400);
+        }
+
+        $days = $leave->days;
+
+        $totalLeave = LeaveRequest::where('user_id', $leave->user_id)
+            ->whereYear('start_date', now()->year)
+            ->where('status', 'approved')
+            ->sum('days');
+
+        if ($totalLeave + $days > 12) {
+            return response()->json([
+                'message' => 'Tidak bisa approve, kuota cuti melebihi 12 hari'
+            ], 400);
+        }
+
         $leave->update([
             'status' => 'approved',
             'approved_by' => $user->id,
@@ -119,6 +139,11 @@ $filePath = $request->file('attachment')->store('attachments', 'public');       
         }
 
         $leave = LeaveRequest::findOrFail($id);
+        if ($leave->status !== 'pending') {
+            return response()->json([
+                'message' => 'Request sudah diproses'
+            ], 400);
+        }
 
         $leave->update([
             'status' => 'rejected',
