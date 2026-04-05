@@ -280,7 +280,8 @@ DB_PASSWORD=
 Tambahkan konfigurasi berikut di file `.env`:
 
 ```env
-GOOGLE_CLIENT_ID=844432569224-3nlo91mul9vfssdpmtageq3tf81qu0rp.apps.googleusercontent.com
+GOOGLE_CLIENT_ID=xxxxx
+GOOGLE_CLIENT_SECRET=xxxxx
 GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/auth/google/callback
 ```
 
